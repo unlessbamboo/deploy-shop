@@ -1,0 +1,51 @@
+FROM centos:centos7.9.2009
+RUN mkdir -p /root/shop && mkdir -p /app
+# WORKDIR指令用于指定容器的一个目录， 容器启动时执行的命令会在该目录下执行。
+WORKDIR /root/shop
+COPY data /root/shop
+
+# 基础包和中文环境
+RUN cp /root/shop/Centos-7.repo /etc/yum.repos.d/CentOS-Base.repo && \
+    yum clean all && yum makecache && yum install -y vim wget lsof htop tree && \
+    yum install -y net-tools bash-completion && yum -y install epel-release \
+    yum -y install kde-l10n-Chinese && yum -y reinstall glibc-common && yum update -y && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    localedef -c -f UTF-8 -i zh_CN zh_CN.utf8 && \
+    echo 'LANG="zh_CN.UTF-8"' >> /etc/locale.conf && \
+    source /etc/locale.conf && \
+    yum clean all
+ENV LANG=zh_CN.UTF-8 \
+    LC_ALL=zh_CN.UTF-8
+
+# python
+RUN yum install -y python-pip gunicorn supervisor patch && \
+    yum install -y gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel && \
+    yum install -y openssl-devel tk-devel libffi-devel xz-devel
+
+# pyenv
+RUN yum install -y make wget cmake gcc bzip2-devel libffi-devel zlib-devel readline-devel && \
+    yum install -y openssl-devel openssl11 openssl11-devel && yum groupinstall -y "Development Tools"
+
+RUN mkdir ~/.pip && cp /root/shop/pip.conf ~/.pip/ && pip install pip==20.3.4 && \
+    tar zxf /root/shop/pyenv/pyenv.tar.gz -C /root/ && mkdir /root/.pyenv/cache && \
+    cd ~/.pyenv && src/configure && make -C src && \
+    echo 'PYENV_ROOT=$HOME/.pyenv' >> /etc/bashrc && \
+    echo 'PATH=$PYENV_ROOT/bin:$PATH' >> /etc/bashrc && \
+    echo 'eval "$(pyenv init -)"' >> /etc/bashrc && \
+    source /etc/bashrc
+ENV PYENV_ROOT=/root/.pyenv
+ENV PATH=$PYENV_ROOT/bin:$PATH
+
+# pyenv-virtualenv
+RUN tar zxf /root/shop/pyenv/pyenv-virtualenv.tar.gz -C /root/shop/pyenv/ && \
+    mv /root/shop/pyenv/pyenv-virtualenv $PYENV_ROOT/plugins/pyenv-virtualenv && \
+    wget https://npm.taobao.org/mirrors/python/3.11.3/Python-3.11.3.tar.xz -P ~/.pyenv/cache/ && \
+    echo 'eval "$(pyenv virtualenv-init -)"' >> /etc/bashrc && \
+    echo 'export FLASK_APP=manage.py' >> /etc/bashrc && \
+    source /etc/bashrc
+
+RUN export CFLAGS="$CFLAGS $(pkg-config --cflags openssl11)" && \
+    export LDFLAGS="$LDFLAGS $(pkg-config --libs openssl11)" && \
+    pyenv install 3.11.3 && pyenv virtualenv 3.11.3 api && \
+    /root/.pyenv/versions/api/bin/pip install --upgrade pip
+

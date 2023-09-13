@@ -1,0 +1,105 @@
+version: "3"
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: 100m
+    max-file: "2"
+
+services:
+  shop-db:
+    container_name: shop-db
+    image: mysql:8.0
+    ports:
+      - "33306:3306"
+    logging: *default-logging
+    environment:
+      MYSQL_ROOT_PASSWORD: Shop,8v99.
+    env_file:
+      - .env
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+      - ./data/mysql/conf/conf.d:/etc/mysql/conf.d
+      - ./data/mysql/conf/my.cnf:/etc/my.cnf
+    privileged: true
+    networks:
+      shop_net:
+        aliases:
+          - shop-db
+
+  shop-redis:
+    container_name: shop-redis
+    image: redis:6
+    command: redis-server
+    volumes:
+      - ./data/redis/data:/data:rw
+    logging: *default-logging
+    restart: always
+    user: root
+    ports:
+      - "36379:6379"
+    environment:
+      - TZ=Asia/Shanghai
+    privileged: true
+    networks:
+      shop_net:
+        aliases:
+          - shop-redis
+
+  shop-nginx:
+    container_name: shop-nginx
+    image: nginx:1.24
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/nginx/logs:/var/log/nginx
+      - ./data/nginx/conf.d:/etc/nginx/conf.d
+      - ./data/nginx/shop:/data/shop
+      - ./data/nginx/bamboo:/data/bamboo
+    logging: *default-logging
+    restart: always
+    user: root
+    environment:
+      - NGINX_PORT=80
+      - TZ=Asia/Shanghai
+    privileged: true
+    networks:
+      shop_net:
+        aliases:
+          - shop-nginx
+
+  shop-api:
+    container_name: shop-api
+    image: shop-api:v1
+    volumes:
+      - ./data/shop-api:/data
+      - ./source/flask-shop:/app/api/flask
+      - ./source/gin-shop:/app/api/gin
+    ports:
+      - 8000-8090:8000-8090
+    logging: *default-logging
+    restart: always
+    tty: true
+    user: root
+    environment:
+      - TZ=Asia/Shanghai
+    privileged: true
+    depends_on:
+      - shop-redis
+      - shop-db
+      - shop-nginx
+    networks:
+      shop_net:
+        aliases:
+          - shop-api
+
+networks:
+  shop_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.15.234.0/24
+          gateway: 172.15.234.1

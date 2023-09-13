@@ -1,0 +1,13 @@
+flask-shop.tar.gz
+flask-instance.tar.gz
+flask-shop
+
+gin-shop.tar.gz
+gin-ship
+
+shop/data/nginx/shop
+shop/data/nginx/bamboo
+shop/data/mysql/data
+shop/data/nginx/logs
+shop/data/redis/data
+shop/source/*
