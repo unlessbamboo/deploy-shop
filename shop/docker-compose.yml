@@ -56,6 +56,7 @@ services:
       - ./data/nginx/conf.d:/etc/nginx/conf.d
       - ./data/nginx/shop:/data/shop
       - ./data/nginx/bamboo:/data/bamboo
+      - ./data/nginx/ssl:/data/ssl
     logging: *default-logging
     restart: always
     user: root
