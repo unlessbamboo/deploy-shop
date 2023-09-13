@@ -10,5 +10,5 @@ shop/data/nginx/bamboo
 shop/data/mysql/data
 shop/data/nginx/logs
 shop/data/redis/data
-data/nginx/ssl/
+shop/data/nginx/ssl/
 shop/source/*
