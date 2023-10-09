@@ -79,7 +79,7 @@ services:
       - ./source/flask-shop:/app/api/flask
       - ./source/gin-shop:/app/api/gin
     ports:
-      - 8000-8090:8000-8090
+      - 8000-8089:8000-8089
     logging: *default-logging
     restart: always
     tty: true
