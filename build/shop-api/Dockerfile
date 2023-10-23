@@ -1,6 +1,6 @@
 FROM base-shop-api
 
-COPY data/source/flask-shop.tar.gz /root/shop/source/
+COPY data/source/requirements.txt data/source/requirements-django.txt /root/shop/source/
 
 # conf
 RUN mkdir -p /app/api/django && \
