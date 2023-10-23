@@ -1,0 +1,21 @@
+Django==4.2.6
+django-configurations==2.4.1
+djangorestframework==3.14.0
+drf-yasg==1.21.7
+django-cacheops==7.0.1
+django-cors-headers==4.3.0
+celery==5.3.4
+
+PyMySQL==1.1.0
+requests==2.31.0
+Pillow==10.0.1
+oss2==2.18.2
+psutil==5.9.6
+
+
+# 辅助(开发环境)
+# pip install jedi-language-server
+# 注意, 在当前目录下设置pyproject.toml
+# pip install "black[jupyter]"
+# pip install pylint-django
+# pip install flake8

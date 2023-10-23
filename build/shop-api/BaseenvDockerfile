@@ -46,6 +46,6 @@ RUN tar zxf /root/shop/pyenv/pyenv-virtualenv.tar.gz -C /root/shop/pyenv/ && \
 
 RUN export CFLAGS="$CFLAGS $(pkg-config --cflags openssl11)" && \
     export LDFLAGS="$LDFLAGS $(pkg-config --libs openssl11)" && \
-    pyenv install 3.11.3 && pyenv virtualenv 3.11.3 api && \
+    pyenv install 3.11.3 && pyenv virtualenv 3.11.3 api && pyenv virtualenv 3.11.3 djangoapi \
     /root/.pyenv/versions/api/bin/pip install --upgrade pip
 

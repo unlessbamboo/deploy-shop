@@ -3,6 +3,9 @@ FROM base-shop-api
 COPY data/source/flask-shop.tar.gz /root/shop/source/
 
 # conf
+RUN mkdir -p /app/api/django && \
+    /root/.pyenv/versions/djangoapi/bin/pip install -r /root/shop/source/requirements-django.txt
+
 RUN mkdir -p /app/api/flask && \
     /root/.pyenv/versions/api/bin/pip install -r /root/shop/source/requirements.txt && \
     rm -rf /root/shop/conf/*
